@@ -1,9 +1,21 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Contacts.scss";
 import { Outlet, useNavigate } from "react-router-dom";
+import axiosInstance from "../../api/axios";
+import { verifyToken } from "../../utils/verify";
 const Contacts = () => {
+  interface Contact {
+    id: number;
+    name: string;
+    phone: string;
+  }
+
   const navigate = useNavigate();
   const [clicked, setClicked] = useState(false);
+  const [contacts, setContacts] = useState<Contact[]>([]);
+  const [notification, setNotification] = useState("");
+  const [notificationStatus, setNotificationStatus] = useState(false);
+
   const handleRedirect = (path: string) => {
     navigate(path, { replace: true });
   };
@@ -13,6 +25,53 @@ const Contacts = () => {
   const handleMouseUp = () => {
     setClicked(false);
   };
+
+  const handleNotificationStatus = (note: string) => {
+    setNotification(note);
+    setNotificationStatus(true);
+    setTimeout(() => {
+      setNotificationStatus(false);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    const findUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/auth/login", { replace: true });
+        }
+        if (!verifyToken()) {
+          navigate("/auth/login", { replace: true });
+          localStorage.removeItem("token");
+        }
+
+        const res = await axiosInstance.get("/user/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(res);
+      } catch {
+        handleNotificationStatus(
+          "Произошла ошибка при загрузке контактов, попробуйте позже"
+        );
+      }
+      try {
+        const token = localStorage.getItem("token");
+        const contacts = await axiosInstance.get("/contact/contacts", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setContacts(contacts.data);
+      } catch (error: unknown) {
+        console.log(error);
+      }
+    };
+    findUser();
+  }, [navigate]);
+
   return (
     <div className="contacts_wrapper">
       <div className="contacts">
@@ -64,88 +123,100 @@ const Contacts = () => {
             Добавить контакт
           </button>
         </div>
-        <div className="contact">
-          <div className="contact_info">
-            <div className="contact_name">Тимур</div>
-            <div className="contact_number">+7 (123) 456-78-90</div>
-          </div>
-          <div className="contact_actions">
-            <button
-              className="edit_contact"
-              onClick={() => handleRedirect("/homepage/edit")}
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+        {contacts.map((contact) => (
+          <div className="contact">
+            <div className="contact_info">
+              <div className="contact_name">{contact.name}</div>
+              <div className="contact_number">{contact.phone}</div>
+            </div>
+            <div className="contact_actions">
+              <button
+                className="edit_contact"
+                onClick={() => handleRedirect(`/homepage/edit/${contact.id}`)}
               >
-                <path
-                  fill-rule="evenodd"
-                  clip-rule="evenodd"
-                  d="M14.4526 3.37221L16.6308 5.55037L17.8293 4.31353C18.0212 4.12159 18.1272 3.83036 18.1272 3.55672C18.1276 3.42334 18.1016 3.29118 18.0508 3.16787C17.9999 3.04456 17.9252 2.93253 17.8309 2.83822L17.1663 2.17367C17.0719 2.07894 16.9597 2.00384 16.8361 1.95272C16.7125 1.90159 16.58 1.87545 16.4462 1.8758C16.1746 1.8758 15.8814 1.98134 15.6902 2.17367L14.4526 3.37221ZM1.87537 18.1253H4.0238L16.1687 6.01087L13.9902 3.83196L1.87537 15.9769V18.1253Z"
-                  fill="#020817"
-                />
-              </svg>
-            </button>
-            <button
-              className="delete_contact"
-              onClick={() => handleRedirect("/homepage/delete")}
-            >
-              <svg
-                width="21"
-                height="21"
-                viewBox="0 0 21 21"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fill-rule="evenodd"
+                    clip-rule="evenodd"
+                    d="M14.4526 3.37221L16.6308 5.55037L17.8293 4.31353C18.0212 4.12159 18.1272 3.83036 18.1272 3.55672C18.1276 3.42334 18.1016 3.29118 18.0508 3.16787C17.9999 3.04456 17.9252 2.93253 17.8309 2.83822L17.1663 2.17367C17.0719 2.07894 16.9597 2.00384 16.8361 1.95272C16.7125 1.90159 16.58 1.87545 16.4462 1.8758C16.1746 1.8758 15.8814 1.98134 15.6902 2.17367L14.4526 3.37221ZM1.87537 18.1253H4.0238L16.1687 6.01087L13.9902 3.83196L1.87537 15.9769V18.1253Z"
+                    fill="#020817"
+                  />
+                </svg>
+              </button>
+              <button
+                className="delete_contact"
+                onClick={() => handleRedirect(`/homepage/delete/${contact.id}`)}
               >
-                <path
-                  d="M5.05854 5.19147L5.83979 17.6915C5.8769 18.4137 6.40229 18.9415 7.08979 18.9415H14.2773C14.9675 18.9415 15.4831 18.4137 15.5273 17.6915L16.3085 5.19147"
-                  stroke="#EF4444"
-                  stroke-width="1.00189"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M3.80889 5.19177H17.5589"
-                  stroke="#EF4444"
-                  stroke-width="1.00189"
-                  stroke-miterlimit="10"
-                  stroke-linecap="round"
-                />
-                <path
-                  d="M8.18341 5.19009V3.62737C8.18305 3.50413 8.20706 3.38204 8.25405 3.26812C8.30105 3.1542 8.3701 3.05069 8.45724 2.96355C8.54438 2.87641 8.64788 2.80736 8.7618 2.76037C8.87573 2.71338 8.99782 2.68937 9.12105 2.68973H12.2465C12.3697 2.68937 12.4918 2.71338 12.6057 2.76037C12.7197 2.80736 12.8232 2.87641 12.9103 2.96355C12.9974 3.05069 13.0665 3.1542 13.1135 3.26812C13.1605 3.38204 13.1845 3.50413 13.1841 3.62737V5.19009"
-                  stroke="#EF4444"
-                  stroke-width="1.00189"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M10.6839 7.68954V16.4395"
-                  stroke="#EF4444"
-                  stroke-width="1.00189"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M7.87092 7.68954L8.18342 16.4395"
-                  stroke="#EF4444"
-                  stroke-width="1.00189"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-                <path
-                  d="M13.496 7.68954L13.1835 16.4395"
-                  stroke="#EF4444"
-                  stroke-width="1.00189"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
+                <svg
+                  width="21"
+                  height="21"
+                  viewBox="0 0 21 21"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5.05854 5.19147L5.83979 17.6915C5.8769 18.4137 6.40229 18.9415 7.08979 18.9415H14.2773C14.9675 18.9415 15.4831 18.4137 15.5273 17.6915L16.3085 5.19147"
+                    stroke="#EF4444"
+                    stroke-width="1.00189"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M3.80889 5.19177H17.5589"
+                    stroke="#EF4444"
+                    stroke-width="1.00189"
+                    stroke-miterlimit="10"
+                    stroke-linecap="round"
+                  />
+                  <path
+                    d="M8.18341 5.19009V3.62737C8.18305 3.50413 8.20706 3.38204 8.25405 3.26812C8.30105 3.1542 8.3701 3.05069 8.45724 2.96355C8.54438 2.87641 8.64788 2.80736 8.7618 2.76037C8.87573 2.71338 8.99782 2.68937 9.12105 2.68973H12.2465C12.3697 2.68937 12.4918 2.71338 12.6057 2.76037C12.7197 2.80736 12.8232 2.87641 12.9103 2.96355C12.9974 3.05069 13.0665 3.1542 13.1135 3.26812C13.1605 3.38204 13.1845 3.50413 13.1841 3.62737V5.19009"
+                    stroke="#EF4444"
+                    stroke-width="1.00189"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M10.6839 7.68954V16.4395"
+                    stroke="#EF4444"
+                    stroke-width="1.00189"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M7.87092 7.68954L8.18342 16.4395"
+                    stroke="#EF4444"
+                    stroke-width="1.00189"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M13.496 7.68954L13.1835 16.4395"
+                    stroke="#EF4444"
+                    stroke-width="1.00189"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            </div>
           </div>
-        </div>
+        ))}
+      </div>
+      <div
+        className="error"
+        style={
+          notificationStatus
+            ? { opacity: 1, zIndex: 1 }
+            : { opacity: 0, zIndex: -2 }
+        }
+      >
+        {notification}
       </div>
       <Outlet />
     </div>

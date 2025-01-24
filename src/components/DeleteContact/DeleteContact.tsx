@@ -1,11 +1,44 @@
-import React from "react";
+import React, { useState } from "react";
 import "./DeleteContact.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import axiosInstance from "../../api/axios";
+import { handleError } from "../../utils/errorHandlingService";
 const DeleteContact = () => {
   const navigate = useNavigate();
+  const [notification, setNotification] = useState("");
+  const [notificationStatus, setNotificationStatus] = useState(false);
+  const { id } = useParams();
+
   const handleRedirect = (path: string) => {
     navigate(path, { replace: true });
   };
+
+  const handleNotificationStatus = (note: string) => {
+    setNotification(note);
+    setNotificationStatus(true);
+    setTimeout(() => {
+      setNotificationStatus(false);
+    }, 3000);
+  };
+
+  const deleteContact = async () => {
+    console.log("id: ", id);
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axiosInstance.delete(`/contact/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(res);
+      handleRedirect("/homepage");
+    } catch (error) {
+      handleNotificationStatus(handleError(error));
+      console.log(error);
+      console.log("id: ", id);
+    }
+  };
+
   return (
     <div className="delete_background">
       <div
@@ -41,8 +74,20 @@ const DeleteContact = () => {
           >
             Отмена
           </button>
-          <button className="delete">Удалить</button>
+          <button className="delete" onClick={deleteContact}>
+            Удалить
+          </button>
         </div>
+      </div>
+      <div
+        className="error"
+        style={
+          notificationStatus
+            ? { opacity: 1, zIndex: 1 }
+            : { opacity: 0, zIndex: -2 }
+        }
+      >
+        {notification}
       </div>
     </div>
   );

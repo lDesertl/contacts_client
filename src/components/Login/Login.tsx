@@ -1,18 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Login.scss";
 import { useNavigate } from "react-router-dom";
-
+import { verifyToken } from "../../utils/verify";
+import { handleError } from "../../utils/errorHandlingService";
+import axiosInstance from "../../api/axios";
 const Login = () => {
   const navigate = useNavigate();
   const [clicked, setClicked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [phone, setPhone] = useState("");
-
+  const [notification, setNotification] = useState("");
+  const [notificationStatus, setNotificationStatus] = useState(false);
+  const [formData, setFormData] = useState({
+    phone: "",
+    password: "",
+  });
   const handleRedirect = (path: string) => {
     navigate(path, { replace: true });
   };
-
-  const handleClick = () => {};
 
   const handleMouseDown = () => {
     setClicked(true);
@@ -20,6 +25,46 @@ const Login = () => {
 
   const handleMouseUp = () => {
     setClicked(false);
+  };
+
+  useEffect(() => {
+    const checkToken = async () => {
+      const isValid = await verifyToken();
+      if (isValid) {
+        navigate("/homepage", { replace: true });
+      } else console.log("Token is invalid or expired");
+    };
+    checkToken();
+  }, [navigate]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleNotificationStatus = (note: string) => {
+    setNotification(note);
+    setNotificationStatus(true);
+    setTimeout(() => {
+      setNotificationStatus(false);
+    }, 3000);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await axiosInstance.post("/auth/login", {
+        phone: formData.phone,
+        password: formData.password,
+      });
+      console.log("Response:", res.data);
+      localStorage.setItem("token", res.data.token);
+      navigate("/homepage", { replace: true });
+    } catch (error: unknown) {
+      handleNotificationStatus(handleError(error));
+    }
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,15 +91,24 @@ const Login = () => {
       </div>
       <label htmlFor="phone">Номер телефона</label>
       <input
+        name="phone"
         type="phone"
         id="phone"
         value={phone}
-        onChange={handlePhoneChange}
-        maxLength={18}
+        onChange={(e) => {
+          handlePhoneChange(e);
+          handleInputChange(e);
+        }}
+        maxLength={17}
       />
       <label htmlFor="password">Пароль</label>
       <div className="password_wrapper">
-        <input type={showPassword ? "text" : "password"} id="password" />
+        <input
+          name="password"
+          type={showPassword ? "text" : "password"}
+          id="password"
+          onChange={handleInputChange}
+        />
         <button
           className="show_password"
           onClick={() => setShowPassword(!showPassword)}
@@ -121,7 +175,7 @@ const Login = () => {
         </button>
       </div>
       <button
-        onClick={handleClick}
+        onClick={handleSubmit}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
@@ -137,6 +191,17 @@ const Login = () => {
         >
           Зарегистрироваться
         </div>
+      </div>
+      <div className="forgot_password">Забыли пароль?</div>
+      <div
+        className="error"
+        style={
+          notificationStatus
+            ? { opacity: 1, zIndex: 1 }
+            : { opacity: 0, zIndex: -2 }
+        }
+      >
+        {notification}
       </div>
     </div>
   );

@@ -1,11 +1,58 @@
-import React from "react";
+import React, { useState } from "react";
 import "./AddContact.scss";
 import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../api/axios";
+import { handleError } from "../../utils/errorHandlingService";
 const AddContact = () => {
   const navigate = useNavigate();
+  const [notification, setNotification] = useState("");
+  const [notificationStatus, setNotificationStatus] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+  });
   const handleRedirect = (path: string) => {
     navigate(path, { replace: true });
   };
+
+  const handleNotificationStatus = (note: string) => {
+    setNotification(note);
+    setNotificationStatus(true);
+    setTimeout(() => {
+      setNotificationStatus(false);
+    }, 3000);
+  };
+
+  const addContact = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axiosInstance.post(
+        "/contact/create",
+        {
+          name: formData.name,
+          phone: formData.phone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(res);
+      handleRedirect("/homepage");
+    } catch (error: unknown) {
+      handleNotificationStatus(handleError(error));
+      console.error(error);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
     <div className="background">
       <div
@@ -32,9 +79,20 @@ const AddContact = () => {
         </div>
         <div className="form">
           <label htmlFor="name">Имя</label>
-          <input type="text" id="name" />
+          <input
+            name="name"
+            type="text"
+            id="name"
+            onChange={handleInputChange}
+          />
           <label htmlFor="phone">Телефон</label>
-          <input type="text" id="phone" />
+          <input
+            name="phone"
+            type="text"
+            id="phone"
+            onChange={handleInputChange}
+            maxLength={11}
+          />
         </div>
         <div className="buttons">
           <button
@@ -43,8 +101,20 @@ const AddContact = () => {
           >
             Отмена
           </button>
-          <button className="save">Добавить</button>
+          <button className="save" onClick={addContact}>
+            Добавить
+          </button>
         </div>
+      </div>
+      <div
+        className="error"
+        style={
+          notificationStatus
+            ? { opacity: 1, zIndex: 1 }
+            : { opacity: 0, zIndex: -2 }
+        }
+      >
+        {notification}
       </div>
     </div>
   );

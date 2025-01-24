@@ -1,0 +1,153 @@
+.settings_background {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  .close_background {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+  .settings {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #fff;
+    .title_wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #020817;
+      }
+      .close {
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+      }
+    }
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      label {
+        color: #020817;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      input {
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 10px;
+        width: 364px;
+        height: 20px;
+      }
+      input:focus {
+        outline-offset: 3px;
+      }
+      button {
+        width: 364px;
+        height: 40px;
+        border-radius: 6px;
+        border: none;
+        background-color: #ef4444;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+    }
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      .cancel {
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #020817;
+        background-color: transparent;
+        cursor: pointer;
+      }
+      .save {
+        border-radius: 6px;
+        border: none;
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #f8fafc;
+        background-color: #0f172a;
+        cursor: pointer;
+      }
+    }
+  }
+  .delete_success {
+    height: 230px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 20px;
+    border-radius: 10px;
+    padding: 20px;
+    background-color: #fff;
+
+    .delete_account_title_wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 20px;
+      font-weight: 700;
+      color: #020817;
+      .delete_account_title {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .close_button {
+        border: none;
+        background-color: transparent;
+        cursor: pointer;
+      }
+    }
+
+    .delete_message {
+      font-size: 14px;
+      font-weight: 400;
+      color: #64748b;
+    }
+    .delete_cancel_button {
+      border: 2px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #020817;
+      background-color: transparent;
+      cursor: pointer;
+    }
+    .delete_success_button {
+      border-radius: 6px;
+      border: none;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #f8fafc;
+      background-color: #0f172a;
+      cursor: pointer;
+    }
+  }
+}

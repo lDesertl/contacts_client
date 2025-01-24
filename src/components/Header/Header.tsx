@@ -1,11 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./Header.scss";
+import { useNavigate } from "react-router-dom";
+import axiosInstance from "../../api/axios";
 const Header = () => {
+  const navigate = useNavigate();
+  const handleExit = (path: string) => {
+    localStorage.removeItem("token");
+    navigate(path, { replace: true });
+  };
+  const handleRedirect = (path: string) => {
+    navigate(path, { replace: true });
+  };
+  const [user, setUser] = useState({
+    id: "",
+    name: "",
+    phone: "",
+    email: "",
+  });
+  useEffect(() => {
+    const findUser = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axiosInstance.get("/user/user", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        console.log(res);
+        setUser(res.data);
+      } catch (error: unknown) {
+        console.log(error);
+      }
+    };
+    findUser();
+  }, []);
   return (
     <div className="header">
       <div className="name">Контакты</div>
-      {/*!!!!!!!!!!!!!!!!!!!!!!!!!!! номер из бд */}
-      <div className="profile">
+      {}
+      <div
+        className="profile"
+        onClick={() => handleRedirect("/homepage/settings")}
+      >
         <svg
           width="16"
           height="16"
@@ -27,9 +63,9 @@ const Header = () => {
             stroke-miterlimit="10"
           />
         </svg>
-        +7 (123) 456-78-90
+        {user?.phone}
       </div>
-      <button className="logout">
+      <button className="logout" onClick={() => handleExit("/auth/login")}>
         <svg
           width="16"
           height="16"

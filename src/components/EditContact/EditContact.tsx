@@ -1,11 +1,80 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import "./EditContact.scss";
+import axiosInstance from "../../api/axios";
+import { handleError } from "../../utils/errorHandlingService";
 const EditContact = () => {
+  const [notification, setNotification] = React.useState("");
+  const [notificationStatus, setNotificationStatus] = React.useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+  });
+  const { id } = useParams();
   const navigate = useNavigate();
   const handleRedirect = (path: string) => {
     navigate(path, { replace: true });
   };
+
+  const handleNotificationStatus = (note: string) => {
+    setNotification(note);
+    setNotificationStatus(true);
+    setTimeout(() => {
+      setNotificationStatus(false);
+    }, 3000);
+  };
+
+  useEffect(() => {
+    const fetchContact = async () => {
+      const token = localStorage.getItem("token");
+      try {
+        const res = await axiosInstance.get(`/contact/contact/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setFormData({
+          name: res.data.name,
+          phone: res.data.phone,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchContact();
+  }, [id]);
+
+  const updateContact = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axiosInstance.put(
+        `/contact/update/${id}`,
+        {
+          name: formData.name,
+          phone: formData.phone,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log(res);
+      handleRedirect("/homepage");
+    } catch (error) {
+      handleNotificationStatus(handleError(error));
+      console.log(error);
+      console.log("id: ", id);
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
   return (
     <div className="edit_background">
       <div
@@ -32,9 +101,22 @@ const EditContact = () => {
         </div>
         <div className="form">
           <label htmlFor="name">Имя</label>
-          <input type="text" id="name" />
+          <input
+            name="name"
+            type="text"
+            id="name"
+            value={formData.name}
+            onChange={handleInputChange}
+          />
           <label htmlFor="phone">Телефон</label>
-          <input type="text" id="phone" />
+          <input
+            name="phone"
+            type="text"
+            id="phone"
+            value={formData.phone}
+            onChange={handleInputChange}
+            maxLength={11}
+          />
         </div>
         <div className="buttons">
           <button
@@ -43,8 +125,20 @@ const EditContact = () => {
           >
             Отмена
           </button>
-          <button className="save">Изменить</button>
+          <button className="save" onClick={updateContact}>
+            Изменить
+          </button>
         </div>
+      </div>
+      <div
+        className="error"
+        style={
+          notificationStatus
+            ? { opacity: 1, zIndex: 1 }
+            : { opacity: 0, zIndex: -2 }
+        }
+      >
+        {notification}
       </div>
     </div>
   );
