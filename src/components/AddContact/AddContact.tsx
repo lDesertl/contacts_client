@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./AddContact.scss";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";
@@ -25,6 +25,13 @@ const AddContact = () => {
 
   const addContact = async () => {
     const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth/login", { replace: true });
+    }
+    if (!formData.name || !formData.phone) {
+      handleNotificationStatus("Заполните все поля");
+      return;
+    }
     try {
       const res = await axiosInstance.post(
         "/contact/create",

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Register.scss";
 import axiosInstance from "../../api/axios";
@@ -47,6 +47,20 @@ const Register = () => {
   };
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.phone || !formData.password) {
+      handleNotificationStatus("Заполните все обязательные поля");
+      return;
+    }
+    if (formData.password.length < 8) {
+      handleNotificationStatus("Пароль должен содержать не менее 8 символов");
+      return;
+    }
+    if (formData.phone.length < 11) {
+      handleNotificationStatus(
+        "Номер телефона должен содержать не менее 11 символов"
+      );
+      return;
+    }
     try {
       const res = await axiosInstance.post("/auth/register", {
         phone: formData.phone,

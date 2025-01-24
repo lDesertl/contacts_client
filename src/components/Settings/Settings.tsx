@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Settings.scss";
 import axiosInstance from "../../api/axios";
@@ -44,6 +44,13 @@ const Settings = () => {
 
   const updateEmail = async () => {
     const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth/login", { replace: true });
+    }
+    if (!email) {
+      handleNotificationStatus("Нет данных для обновления");
+      return;
+    }
     try {
       const res = await axiosInstance.put(
         `/user/update`,

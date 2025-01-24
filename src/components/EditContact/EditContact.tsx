@@ -46,6 +46,13 @@ const EditContact = () => {
 
   const updateContact = async () => {
     const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/auth/login", { replace: true });
+    }
+    if (!formData.name && !formData.phone) {
+      handleNotificationStatus("Нет данных для обновления");
+      return;
+    }
     try {
       const res = await axiosInstance.put(
         `/contact/update/${id}`,

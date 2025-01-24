@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Contacts.scss";
 import { Outlet, useNavigate } from "react-router-dom";
 import axiosInstance from "../../api/axios";

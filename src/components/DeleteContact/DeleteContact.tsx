@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./DeleteContact.scss";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../api/axios";

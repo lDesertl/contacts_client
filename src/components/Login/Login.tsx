@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import "./Login.scss";
 import { useNavigate } from "react-router-dom";
 import { verifyToken } from "../../utils/verify";
@@ -54,6 +54,10 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.phone || !formData.password) {
+      handleNotificationStatus("Заполните все поля");
+      return;
+    }
     try {
       const res = await axiosInstance.post("/auth/login", {
         phone: formData.phone,
