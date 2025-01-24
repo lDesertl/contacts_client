@@ -1,12 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Contacts.scss";
 const Contacts = () => {
+  const [clicked, setClicked] = useState(false);
+  const handleMouseDown = () => {
+    setClicked(true);
+  };
+  const handleMouseUp = () => {
+    setClicked(false);
+  };
   return (
     <div className="contacts_wrapper">
       <div className="contacts">
         <div className="contacts_title">
           <div className="title">Список контактов</div>
-          <button className="add_contact">
+          <button
+            className="add_contact"
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            style={{ transform: clicked ? "scale(0.95)" : "scale(1)" }}
+          >
             <svg
               width="16"
               height="16"

@@ -5,16 +5,39 @@ const Register = () => {
   const navigate = useNavigate();
   const [clicked, setClicked] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [phone, setPhone] = useState("");
+
   const handleRedirect = (path: string) => {
     navigate(path, { replace: true });
   };
+
   const handleClick = () => {};
+
   const handleMouseDown = () => {
     setClicked(true);
   };
+
   const handleMouseUp = () => {
     setClicked(false);
   };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "");
+
+    if (value.length > 11) {
+      value = value.slice(0, 11);
+    }
+
+    if (value.length === 11) {
+      value = `${value[0]} (${value.slice(1, 4)}) ${value.slice(
+        4,
+        7
+      )}-${value.slice(7, 9)}-${value.slice(9, 11)}`;
+    }
+
+    setPhone(value);
+  };
+
   return (
     <div className="register">
       <div className="login_title">Создать аккаунт</div>
@@ -22,7 +45,13 @@ const Register = () => {
         Зарегистрируйтесь, чтобы начать управлять контактами
       </div>
       <label htmlFor="phone">Номер телефона*</label>
-      <input type="phone" id="phone" />
+      <input
+        type="phone"
+        id="phone"
+        value={phone}
+        onChange={handlePhoneChange}
+        maxLength={18}
+      />
       <label htmlFor="password">Пароль*</label>
       <div className="password_wrapper">
         <input type={showPassword ? "text" : "password"} id="password" />
