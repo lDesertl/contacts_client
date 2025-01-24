@@ -1,0 +1,96 @@
+.contacts_wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  height: calc(100vh - 50px);
+
+  .contacts {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 80%;
+    padding: 20px 0;
+
+    .contacts_title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      .title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #020817;
+      }
+      .add_contact {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #f8fafc;
+        background-color: #0f172a;
+      }
+    }
+    .contact {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 10px 20px;
+      .contact_info {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        .contact_name {
+          font-size: 16px;
+          font-weight: 600;
+          color: #020817;
+        }
+        .contact_number {
+          font-size: 14px;
+          font-weight: 500;
+          color: #64748b;
+        }
+      }
+      .contact_actions {
+        display: flex;
+        gap: 10px;
+        .edit_contact {
+          width: 50px;
+          height: 50px;
+          border: none;
+          border-radius: 6px;
+          padding: 10px;
+          font-size: 14px;
+          font-weight: 500;
+          color: #64748b;
+          background-color: transparent;
+          transition: all 0.3s ease-in-out;
+          cursor: pointer;
+        }
+        .edit_contact:hover {
+          background-color: #64748b25;
+        }
+        .delete_contact {
+          width: 50px;
+          height: 50px;
+          border: none;
+          border-radius: 6px;
+          padding: 10px;
+          font-size: 14px;
+          font-weight: 500;
+          color: #64748b;
+          background-color: transparent;
+          transition: all 0.3s ease-in-out;
+          cursor: pointer;
+        }
+        .delete_contact:hover {
+          background-color: #64748b25;
+        }
+      }
+    }
+  }
+}
