@@ -6,6 +6,10 @@ import Login from "./components/Login/Login";
 import Register from "./components/Register/Register";
 import Header from "./components/Header/Header";
 import Contacts from "./pages/Contacts/Contacts";
+import AddContact from "./components/AddContact/AddContact";
+import EditContact from "./components/EditContact/EditContact";
+import DeleteContact from "./components/DeleteContact/DeleteContact";
+
 function App() {
   return (
     <Router>
@@ -23,7 +27,9 @@ function App() {
             </>
           }
         >
-          {/* <Route path="contacts" element={<Contacts />} /> */}
+          <Route path="add" element={<AddContact />} />
+          <Route path="edit" element={<EditContact />} />
+          <Route path="delete" element={<DeleteContact />} />
         </Route>
       </Routes>
     </Router>

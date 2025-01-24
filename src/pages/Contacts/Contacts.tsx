@@ -1,7 +1,12 @@
 import React, { useState } from "react";
 import "./Contacts.scss";
+import { Outlet, useNavigate } from "react-router-dom";
 const Contacts = () => {
+  const navigate = useNavigate();
   const [clicked, setClicked] = useState(false);
+  const handleRedirect = (path: string) => {
+    navigate(path, { replace: true });
+  };
   const handleMouseDown = () => {
     setClicked(true);
   };
@@ -18,6 +23,7 @@ const Contacts = () => {
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
+            onClick={() => handleRedirect("/homepage/add")}
             style={{ transform: clicked ? "scale(0.95)" : "scale(1)" }}
           >
             <svg
@@ -64,7 +70,10 @@ const Contacts = () => {
             <div className="contact_number">+7 (123) 456-78-90</div>
           </div>
           <div className="contact_actions">
-            <button className="edit_contact">
+            <button
+              className="edit_contact"
+              onClick={() => handleRedirect("/homepage/edit")}
+            >
               <svg
                 width="20"
                 height="20"
@@ -80,7 +89,10 @@ const Contacts = () => {
                 />
               </svg>
             </button>
-            <button className="delete_contact">
+            <button
+              className="delete_contact"
+              onClick={() => handleRedirect("/homepage/delete")}
+            >
               <svg
                 width="21"
                 height="21"
@@ -135,6 +147,7 @@ const Contacts = () => {
           </div>
         </div>
       </div>
+      <Outlet />
     </div>
   );
 };
