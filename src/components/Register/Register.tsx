@@ -61,6 +61,10 @@ const Register = () => {
       );
       return;
     }
+    if (!/^\S+@\S+\.\S{2,}$/.test(formData.email)) {
+      handleNotificationStatus("Введите корректный email");
+      return;
+    }
     try {
       const res = await axiosInstance.post("/auth/register", {
         phone: formData.phone,
